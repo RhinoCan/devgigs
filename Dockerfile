@@ -28,4 +28,4 @@ COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 EXPOSE 80
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["/bin/sh", "-c", "chmod +x /var/www/html/scripts/00-laravel-deploy.sh && /var/www/html/scripts/00-laravel-deploy.sh && /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf"]
