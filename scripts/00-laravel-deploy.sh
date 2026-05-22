@@ -12,5 +12,10 @@ php artisan route:cache
 echo "Running migrations..."
 php artisan migrate --force
 
+echo "Creating storage directories..."
+mkdir -p /var/www/html/storage/app/public
+mkdir -p /var/www/html/storage/app/public/logos
+chmod -R 775 /var/www/html/storage
+
 echo "Linking storage..."
 php artisan storage:link
