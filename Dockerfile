@@ -1,19 +1,31 @@
-FROM tangramor/nginx-php8-fpm:php8.4.16_withoutNodejs
+FROM php:8.4-fpm-alpine
 
+# Install system dependencies
+RUN apk add --no-cache nginx supervisor curl zip unzip git \
+    libpng-dev libzip-dev postgresql-dev
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo pdo_pgsql zip gd opcache
+
+# Install composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy application
 COPY . .
 
-# Image config
-ENV SKIP_COMPOSER 1
-ENV WEBROOT /var/www/html/public
-ENV PHP_ERRORS_STDERR 1
-ENV RUN_SCRIPTS 1
-ENV REAL_IP_HEADER 1
+# Install dependencies
+RUN composer install --no-dev --optimize-autoloader
 
-# Laravel config
-ENV APP_ENV production
-ENV APP_DEBUG false
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Allow composer to run as root
-ENV COMPOSER_ALLOW_SUPERUSER 1
+# Copy nginx and supervisor config
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-CMD ["/start.sh"]
+EXPOSE 80
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
