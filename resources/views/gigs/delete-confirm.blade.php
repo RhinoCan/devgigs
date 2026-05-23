@@ -8,7 +8,7 @@
         {{-- Gig details --}}
         <div class="mb-8">
             @if ($gig->logo)
-                <img src="{{ asset('storage/' . $gig->logo) }}" alt="logo" class="w-24 mx-auto mb-4" />
+                <img src="{{ $gig->logo }}" alt="logo" class="w-24 mx-auto mb-4" />
             @endif
             <table class="w-full text-sm">
                 <tr class="border-b">

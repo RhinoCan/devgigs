@@ -76,7 +76,7 @@
 
             <div class="mb-6"
                 x-data="{
-                    previewUrl: '{{ $gig->logo ? asset('storage/' . $gig->logo) : asset('images/No_Image_Available.jpg') }}',
+                    previewUrl: '{{ $gig->logo ?? asset('images/No_Image_Available.jpg') }}',
                     placeholder: '{{ asset('images/No_Image_Available.jpg') }}',
                     removeLogo: false,
                     handleFile(event) {

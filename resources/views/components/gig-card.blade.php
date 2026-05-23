@@ -3,7 +3,7 @@
 <x-card>
     <div class="flex">
         <img class="hidden w-48 mr-6 md:block"
-        src="{{ $gig->logo ? asset('storage/' . $gig->logo) : asset('/images/No_Image_Available.jpg') }}"
+        src="{{ $gig->logo ?? asset('/images/No_Image_Available.jpg') }}"
         alt="logo" />
         <div>
             <h3 class="text-2xl">

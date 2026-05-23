@@ -6,7 +6,7 @@
         <x-card class="p10">
             <div class="flex flex-col items-center justify-center text-center">
                 <img class="w-48 mr-6 mb-6"
-                    src="{{ $gig->logo ? asset('storage/' . $gig->logo) : asset('/images/No_Image_Available.jpg') }}"
+                    src="{{ $gig->logo ?? asset('/images/No_Image_Available.jpg') }}"
                     alt="logo" />
 
                 <h3 class="text-2xl mb-2">{{ $gig->title }}</h3>

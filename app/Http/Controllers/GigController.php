@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Storage;
+use Cloudinary\Cloudinary;
 use Illuminate\Http\Request;
 use App\Models\Gig;
 
@@ -25,7 +25,6 @@ class GigController extends Controller
   // Store new gigs
   public function store(Request $request)
   {
-    // dd($request->hasFile('logo'), $request->allFiles());jj
     $formFields = $request->validate([
       'title' => 'required',
       'company' => 'required',
@@ -37,7 +36,12 @@ class GigController extends Controller
     ]);
 
     if ($request->hasFile('logo')) {
-      $formFields['logo'] = $request->file('logo')->store('logos', 'public');
+      $cloudinary = new Cloudinary(env('CLOUDINARY_URL'));
+      $result = $cloudinary->uploadApi()->upload(
+        $request->file('logo')->getRealPath(),
+        ['folder' => 'devgigs/logos']
+      );
+      $formFields['logo'] = $result['secure_url'];
     }
 
     $formFields['user_id'] = auth()->id();
@@ -64,39 +68,49 @@ class GigController extends Controller
     return view('gigs.edit', ['gig' => $gig]);
   }
 
-  // Update one gig
-  public function update(Request $request, Gig $gig)
-  {
+// Update one gig
+public function update(Request $request, Gig $gig)
+{
     if ($gig->user_id != auth()->id()) {
-      abort(403, "You cannot edit gigs you didn't add to the database");
+        abort(403, "You cannot edit gigs you didn't add to the database");
     }
 
     $formFields = $request->validate([
-      'title' => 'required',
-      'company' => 'required',
-      'location' => 'required',
-      'website' => ['required', 'url'],
-      'email' => ['required', 'email'],
-      'tags' => 'required',
-      'description' => 'required'
+        'title' => 'required',
+        'company' => 'required',
+        'location' => 'required',
+        'website' => ['required', 'url'],
+        'email' => ['required', 'email'],
+        'tags' => 'required',
+        'description' => 'required'
     ]);
 
     if ($request->hasFile('logo')) {
-      if ($gig->logo) {
-        Storage::disk('public')->delete($gig->logo);
-      }
-      $formFields['logo'] = $request->file('logo')->store('logos', 'public');
+        if ($gig->logo) {
+            // Extract public ID from URL and delete from Cloudinary
+            $cloudinary = new Cloudinary(env('CLOUDINARY_URL'));
+            $publicId = pathinfo(parse_url($gig->logo, PHP_URL_PATH), PATHINFO_FILENAME);
+            $cloudinary->uploadApi()->destroy('devgigs/logos/' . $publicId);
+        }
+        $cloudinary = $cloudinary ?? new Cloudinary(env('CLOUDINARY_URL'));
+        $result = $cloudinary->uploadApi()->upload(
+            $request->file('logo')->getRealPath(),
+            ['folder' => 'devgigs/logos']
+        );
+        $formFields['logo'] = $result['secure_url'];
     } elseif ($request->input('remove_logo') === '1') {
-      if ($gig->logo) {
-        Storage::disk('public')->delete($gig->logo);
-      }
-      $formFields['logo'] = null;
+        if ($gig->logo) {
+            $cloudinary = new Cloudinary(env('CLOUDINARY_URL'));
+            $publicId = pathinfo(parse_url($gig->logo, PHP_URL_PATH), PATHINFO_FILENAME);
+            $cloudinary->uploadApi()->destroy('devgigs/logos/' . $publicId);
+        }
+        $formFields['logo'] = null;
     }
 
     $gig->update($formFields);
 
     return redirect('/')->with('message', 'Your gig has been updated in the database.');
-  }
+}
 
   // Destroy one gig
   public function destroy(Gig $gig)
