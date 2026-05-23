@@ -1,26 +1,36 @@
-#!/usr/bin/env sh
+FROM php:8.4-fpm-alpine
 
-echo "Running package discovery..."
-php artisan package:discover --ansi
+# Install system dependencies
+RUN apk add --no-cache nginx supervisor curl zip unzip git \
+    libpng-dev libzip-dev postgresql-dev
 
-echo "Caching config..."
-php artisan config:cache
+# Install PHP extensions
+RUN docker-php-ext-install pdo pdo_pgsql zip gd opcache
 
-echo "Caching routes..."
-php artisan route:cache
+RUN echo "upload_max_filesize=20M" > /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "post_max_size=20M" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "memory_limit=256M" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "max_execution_time=60" >> /usr/local/etc/php/conf.d/uploads.ini
 
-echo "Running migrations..."
-php artisan migrate --force
+# Install composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-echo "Creating storage directories..."
-mkdir -p /var/www/html/storage/app/public
-mkdir -p /var/www/html/storage/app/public/logos
-chmod -R 775 /var/www/html/storage
+# Set working directory
+WORKDIR /var/www/html
 
-echo "Linking storage..."
-php artisan storage:link
+# Copy application
+COPY . .
 
-echo "Setting public storage permissions..."
-chown -R www-data:www-data /var/www/html/storage
-chown -R www-data:www-data /var/www/html/public
-chmod -R 775 /var/www/html/public/storage
+# Install dependencies
+RUN composer install --no-dev --optimize-autoloader --no-scripts
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Copy nginx and supervisor config
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+EXPOSE 80
+
+CMD ["/bin/sh", "-c", "chmod +x /var/www/html/scripts/00-laravel-deploy.sh && /var/www/html/scripts/00-laravel-deploy.sh && /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf"]

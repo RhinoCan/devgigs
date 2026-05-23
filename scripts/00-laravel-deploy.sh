@@ -19,3 +19,8 @@ chmod -R 775 /var/www/html/storage
 
 echo "Linking storage..."
 php artisan storage:link
+
+echo "Setting public storage permissions..."
+chown -R www-data:www-data /var/www/html/storage
+chown -R www-data:www-data /var/www/html/public
+chmod -R 775 /var/www/html/public/storage
