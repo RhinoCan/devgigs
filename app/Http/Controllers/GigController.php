@@ -86,18 +86,19 @@ public function update(Request $request, Gig $gig)
     ]);
 
     if ($request->hasFile('logo')) {
+        $cloudinary = new Cloudinary(env('CLOUDINARY_URL'));
+
         if ($gig->logo) {
-            // Extract public ID from URL and delete from Cloudinary
-            $cloudinary = new Cloudinary(env('CLOUDINARY_URL'));
             $publicId = pathinfo(parse_url($gig->logo, PHP_URL_PATH), PATHINFO_FILENAME);
             $cloudinary->uploadApi()->destroy('devgigs/logos/' . $publicId);
         }
-        $cloudinary = $cloudinary ?? new Cloudinary(env('CLOUDINARY_URL'));
+
         $result = $cloudinary->uploadApi()->upload(
             $request->file('logo')->getRealPath(),
             ['folder' => 'devgigs/logos']
         );
         $formFields['logo'] = $result['secure_url'];
+
     } elseif ($request->input('remove_logo') === '1') {
         if ($gig->logo) {
             $cloudinary = new Cloudinary(env('CLOUDINARY_URL'));
