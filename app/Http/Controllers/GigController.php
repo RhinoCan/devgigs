@@ -88,10 +88,11 @@ class GigController extends Controller
 
     $gig->update($formFields);
 
-    return redirect('/')->with('message', 'Your gig has been updated in the database.');
+    $source = $request->input('source');
+    return redirect($source === 'manage' ? '/manage' : '/')->with('message', 'Your gig has been updated in the database.');
   }
 
-public function destroy(Gig $gig)
+public function destroy(Request $request, Gig $gig)
 {
     if ($gig->user_id != auth()->id()) {
         abort(403, "You cannot delete gigs you didn't add to the database");
@@ -108,7 +109,8 @@ public function destroy(Gig $gig)
     }
 
     $gig->delete();
-    return redirect('/')->with('message', 'Your gig has been deleted from the database.');
+    $source = $request->input('source');
+    return redirect($source === 'manage' ? '/manage' : '/')->with('message', 'Your gig has been deleted from the database.');
 }
 
   // Manage gigs

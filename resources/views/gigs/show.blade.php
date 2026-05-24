@@ -40,10 +40,10 @@
             </div>
         </x-card>
         <x-card class="mt-4 p-2 flex space-x-6">
-            <a href="/{{ $gig->id }}/edit">
+            <a href="/{{ $gig->id }}/edit?source=show">
                 <i class="fa-solid fa-pencil"></i> Edit
             </a>
-            <a href="/{{ $gig->id }}/delete-confirm" class="text-red-600">
+            <a href="/{{ $gig->id }}/delete-confirm?source=show" class="text-red-600">
                 <i class="fa-solid fa-trash-can"></i> Delete
             </a>
         </x-card>

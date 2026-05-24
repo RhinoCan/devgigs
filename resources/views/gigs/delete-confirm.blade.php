@@ -50,6 +50,7 @@
             <form method="POST" action="/{{ $gig->id }}">
                 @csrf
                 @method('DELETE')
+                <input type="hidden" name="source" value="{{ request('source') }}">
                 <button class="bg-red-600 text-white rounded py-2 px-4 hover:bg-black">
                     <i class="fa-solid fa-trash-can"></i> Confirm Delete
                 </button>

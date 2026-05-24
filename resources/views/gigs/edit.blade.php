@@ -10,6 +10,7 @@
         <form method="POST" action="/{{ $gig->id }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
+            <input type="hidden" name="source" value="{{ request('source') }}">
             <div class="mb-6">
                 <label for="company" class="inline-block text-lg mb-2">Company Name</label>
                 <input type="text" class="border border-gray-200 rounded p-2 w-full" name="company"
@@ -142,7 +143,7 @@
                     Edit Gig
                 </button>
 
-                <a href="/" class="text-black ml-4"> Back </a>
+                <a href="{{ request('source') === 'manage' ? '/manage' : '/'}}" class="text-black ml-4"> Back </a>
             </div>
         </form>
     </x-card>
