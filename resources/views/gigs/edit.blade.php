@@ -74,50 +74,55 @@
                 @enderror
             </div>
 
-            <div class="mb-6"
-                x-data="{
+            <div class="mb-6">
+                <label for="logo" class="inline-block text-lg mb-2">Company Logo</label>
+
+                <div x-data="{
                     previewUrl: '{{ $gig->logo ?? asset('images/No_Image_Available.jpg') }}',
                     placeholder: '{{ asset('images/No_Image_Available.jpg') }}',
-                    removeLogo: false,
-                    handleFile(event) {
+                    uploading: false,
+                    async handleFile(event) {
                         const file = event.target.files[0];
-                        if (file) {
-                            this.previewUrl = URL.createObjectURL(file);
-                            this.removeLogo = false;
-                        }
+                        if (!file) return;
+                        this.uploading = true;
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        formData.append('upload_preset', 'devgigs_upload');
+                        formData.append('folder', 'devgigs/logos');
+                        const response = await fetch('https://api.cloudinary.com/v1_1/daufnw5dc/image/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const data = await response.json();
+                        this.previewUrl = data.secure_url;
+                        this.$refs.logoUrl.value = data.secure_url;
+                        this.uploading = false;
                     },
                     handleRemove() {
                         this.previewUrl = this.placeholder;
-                        this.removeLogo = true;
+                        this.$refs.logoUrl.value = '';
                         this.$refs.logoInput.value = '';
+                        this.removeLogo = true;
                     }
-                }"
-            >
-                <label for="logo" class="inline-block text-lg mb-2">Company Logo</label>
+                }" x-init="() => {}">
+                    <img :src="previewUrl" alt="Logo preview"
+                        class="mb-3 w-48 h-48 object-contain border border-gray-200 rounded" />
 
-                <img :src="previewUrl" alt="Logo preview" class="mb-3 w-48 h-48 object-contain border border-gray-200 rounded" />
+                    <div x-show="uploading" class="text-sm text-gray-500 mb-2">Uploading...</div>
 
-                <input
-                    type="file"
-                    class="border border-gray-200 rounded p-2 w-full"
-                    name="logo"
-                    x-ref="logoInput"
-                    @change="handleFile"
-                />
+                    <input type="file" class="border border-gray-200 rounded p-2 w-full" x-ref="logoInput"
+                        @change="handleFile" accept="image/*" />
 
-                <input type="hidden" name="remove_logo" :value="removeLogo ? '1' : '0'" />
+                    <input type="hidden" name="logo_url" x-ref="logoUrl" value="{{ $gig->logo ?? '' }}" />
+                    <input type="hidden" name="remove_logo" x-bind:value="removeLogo ? '1' : '0'" />
 
-                <button
-                    type="button"
-                    class="mt-2 text-sm text-red-500 hover:text-red-700"
-                    @click="handleRemove"
-                >
-                    Remove logo
-                </button>
+                    <a @click.prevent="handleRemove" href="#"
+                        class="text-red-500 text-sm mt-2 inline-block">Remove logo</a>
 
-                @error('logo')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
+                    @error('logo')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <div class="mb-6">

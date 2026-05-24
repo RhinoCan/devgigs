@@ -35,17 +35,8 @@ class GigController extends Controller
       'description' => 'required'
     ]);
 
-    if ($request->hasFile('logo')) {
-      try {
-        $cloudinary = new Cloudinary(env('CLOUDINARY_URL'));
-        $result = $cloudinary->uploadApi()->upload(
-          $request->file('logo')->getRealPath(),
-          ['folder' => 'devgigs/logos']
-        );
-        $formFields['logo'] = $result['secure_url'];
-      } catch (\Exception $e) {
-        return back()->withErrors(['logo' => 'Image upload failed: ' . $e->getMessage()])->withInput();
-      }
+    if ($request->filled('logo_url')) {
+      $formFields['logo'] = $request->input('logo_url');
     }
 
     $formFields['user_id'] = auth()->id();
@@ -89,29 +80,9 @@ class GigController extends Controller
       'description' => 'required'
     ]);
 
-    if ($request->hasFile('logo')) {
-      try {
-        $cloudinary = new Cloudinary(env('CLOUDINARY_URL'));
-
-        if ($gig->logo) {
-          $publicId = pathinfo(parse_url($gig->logo, PHP_URL_PATH), PATHINFO_FILENAME);
-          $cloudinary->uploadApi()->destroy('devgigs/logos/' . $publicId);
-        }
-
-        $result = $cloudinary->uploadApi()->upload(
-          $request->file('logo')->getRealPath(),
-          ['folder' => 'devgigs/logos']
-        );
-        $formFields['logo'] = $result['secure_url'];
-      } catch (\Exception $e) {
-        return back()->withErrors(['logo' => 'Image upload failed: ' . $e->getMessage()])->withInput();
-      }
+    if ($request->filled('logo_url')) {
+      $formFields['logo'] = $request->input('logo_url');
     } elseif ($request->input('remove_logo') === '1') {
-      if ($gig->logo) {
-        $cloudinary = new Cloudinary(env('CLOUDINARY_URL'));
-        $publicId = pathinfo(parse_url($gig->logo, PHP_URL_PATH), PATHINFO_FILENAME);
-        $cloudinary->uploadApi()->destroy('devgigs/logos/' . $publicId);
-      }
       $formFields['logo'] = null;
     }
 
@@ -120,15 +91,25 @@ class GigController extends Controller
     return redirect('/')->with('message', 'Your gig has been updated in the database.');
   }
 
-  // Destroy one gig
-  public function destroy(Gig $gig)
-  {
+public function destroy(Gig $gig)
+{
     if ($gig->user_id != auth()->id()) {
-      abort(403, "You cannot delete gigs you didn't add to the database");
+        abort(403, "You cannot delete gigs you didn't add to the database");
     }
+
+    if ($gig->logo) {
+        try {
+            $cloudinary = new Cloudinary(env('CLOUDINARY_URL'));
+            $publicId = 'devgigs/logos/' . pathinfo(parse_url($gig->logo, PHP_URL_PATH), PATHINFO_FILENAME);
+            $cloudinary->uploadApi()->destroy($publicId);
+        } catch (\Exception $e) {
+            // Log but don't block deletion if Cloudinary fails
+        }
+    }
+
     $gig->delete();
     return redirect('/')->with('message', 'Your gig has been deleted from the database.');
-  }
+}
 
   // Manage gigs
   public function manage()
