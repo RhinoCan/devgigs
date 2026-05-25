@@ -5,8 +5,7 @@
     <div class="mx-4">
         <x-card class="p10">
             <div class="flex flex-col items-center justify-center text-center">
-                <img class="w-48 mr-6 mb-6"
-                    src="{{ $gig->logo ?? asset('/images/No_Image_Available.jpg') }}"
+                <img class="w-48 mr-6 mb-6" src="{{ $gig->logo ?? asset('/images/No_Image_Available.jpg') }}"
                     alt="logo" />
 
                 <h3 class="text-2xl mb-2">{{ $gig->title }}</h3>
@@ -39,15 +38,21 @@
                 </div>
             </div>
         </x-card>
-        <x-card class="mt-4 p-2 flex space-x-6">
-            <a href="/{{ $gig->id }}/edit?source=show">
-                <i class="fa-solid fa-pencil"></i> Edit
-            </a>
-            <a href="/{{ $gig->id }}/delete-confirm?source=show" class="text-red-600">
-                <i class="fa-solid fa-trash-can"></i> Delete
-            </a>
-        </x-card>
+        @auth
+            @if (auth()->id() === $gig->user_id)
+                {
+                <x-card class="mt-4 p-2 flex space-x-6">
+                    <a href="/{{ $gig->id }}/edit?source=show">
+                        <i class="fa-solid fa-pencil"></i> Edit
+                    </a>
+                    <a href="/{{ $gig->id }}/delete-confirm?source=show" class="text-red-600">
+                        <i class="fa-solid fa-trash-can"></i> Delete
+                    </a>
+                </x-card>
+                }
+            @endif
+        @endauth
     </div>
-    <x-footer bgColor='bg-gigs' buttonText="Post a gig" buttonHref="/create" :showButton="true" />
+    <x-fab bgColor='bg-gigs' />
 
 </x-layout>

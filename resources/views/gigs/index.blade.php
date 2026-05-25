@@ -16,6 +16,15 @@
     <div class="mt-6 p-4">
         {{ $gigs->links() }}
     </div>
-    <x-footer bgColor='bg-gigs' buttonText="Post a gig" buttonHref="/create" :showButton="true" />
+
+    @auth
+        <a href="/create"
+            class="fixed bottom-6 right-6 bg-gigs text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-black text-2xl z-50">
+            <i class="fa-solid fa-plus"></i>
+        </a>
+    @endauth
+
+    <x-fab bgColor='bg-gigs' />
+    <x-footer />
 
 </x-layout>

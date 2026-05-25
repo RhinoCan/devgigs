@@ -57,5 +57,4 @@
             </form>
         </div>
     </x-card>
-    <x-footer bgColor='bg-gigs' buttonText="Post a gig" buttonHref="/create" :showButton="true" />
 </x-layout>
