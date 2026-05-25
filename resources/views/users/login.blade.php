@@ -38,10 +38,9 @@
          <div class="mt-8">
              <p>
                  Don't have an account?
-                 <a href="/register" class="text-laravel">Register</a>
+                 <a href="/register" class="bg-yellow-500 text-black rounded py-2 px-4">Register</a>
              </p>
          </div>
      </form>
     </x-card>
-    <x-footer bgColor='bg-white' :showButton="false" />
  </x-layout>

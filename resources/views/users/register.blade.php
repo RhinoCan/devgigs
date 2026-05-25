@@ -64,10 +64,9 @@
             <div class="mt-8">
                 <p>
                     Already have an account?
-                    <a href="/login" class="text-laravel">Login</a>
+                    <a href="/login" class="bg-yellow-500 text-black rounded py-2 px-4">Login</a>
                 </p>
             </div>
         </form>
     </x-card>
-    <x-footer bgColor='bg-white' :showButton="false" />
 </x-layout>
