@@ -36,15 +36,4 @@ class User extends Authenticatable
       return $this->hasMany(Gig::class, 'user_id');
     }
 
-    // Relationship with books
-    public function books()
-    {
-      return $this->hasMany(Book::class, 'user_id');
-    }
-
-    // Relationship with albums
-    public function albums()
-    {
-      return $this->hasMany(Album::class, 'user_id');
-    }
 }

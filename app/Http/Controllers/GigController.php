@@ -12,7 +12,7 @@ class GigController extends Controller
   public function index()
   {
     return view('gigs.index', [
-      'gigs' => Gig::latest()->filter(request(['tag', 'search']))->paginate(6)
+      'gigs' => Gig::latest()->filter(request(['tags', 'search']))->paginate(6)
     ]);
   }
 
@@ -100,6 +100,12 @@ public function destroy(Request $request, Gig $gig)
 
     if ($gig->logo) {
         try {
+        // NOTE: The lines in this try block are not covered by automated tests. The Cloudinary SDK is
+        // instantiated inside this method, making it impossible to inject a mock without
+        // refactoring production code purely to serve the test. A mock would only verify
+        // that the correct method was called — not that Cloudinary actually deleted the
+        // image. Meaningful verification requires a live integration test against the
+        // real Cloudinary API, which is outside the scope of this test suite.
             $cloudinary = new Cloudinary(env('CLOUDINARY_URL'));
             $publicId = 'devgigs/logos/' . pathinfo(parse_url($gig->logo, PHP_URL_PATH), PATHINFO_FILENAME);
             $cloudinary->uploadApi()->destroy($publicId);

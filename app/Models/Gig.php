@@ -23,13 +23,13 @@ class Gig extends Model
 
   public function scopeFilter($query, array $filters)
   {
-    if ($filters['tag'] ?? false) {
-      $query->where('tags', 'like', '%' . request('tag') . '%');
+    if ($filters['tags'] ?? false) {
+      $query->where('tags', 'like', '%' . $filters['tags'] . '%');
     }
     if ($filters['search'] ?? false) {
-      $query->where('title', 'like', '%' . request('search') . '%')
-        ->orWhere('location', 'like', '%' . request('search') . '%')
-        ->orWhere('tags', 'like', '%' . request('search') . '%');
+      $query->where('title', 'like', '%' . $filters['search'] . '%')
+        ->orWhere('location', 'like', '%' . $filters['search'] . '%')
+        ->orWhere('tags', 'like', '%' . $filters['search'] . '%');
     }
   }
 

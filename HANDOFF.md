@@ -1,3 +1,7 @@
+Here's the updated handoff document:
+
+---
+
 # Laragigs2 — Project Handoff Document (Updated)
 
 ## Context
@@ -25,6 +29,10 @@ A second goal has emerged: **contributing to the FakerPHP open source project**,
 | MyStuff location | `C:\Laravel\mystuff` |
 | DevGigs local URL | `http://devgigs.test` |
 | MyStuff local URL | `http://mystuff.test` |
+| DevGigs Render | `http://devgigs.onrender.com` |
+| MyStuff Render | `http://mystuff-940q.onrender.com` |
+| Neon | projects DevGigs and MyStuff |
+| Cloudinary | storing images, including logos and covers of books and albums |
 
 ### VSCode Extensions Installed
 - Laravel Extra Intellisense
@@ -41,6 +49,16 @@ A second goal has emerged: **contributing to the FakerPHP open source project**,
 - `emmet.triggerExpansionOnTab`: `true`
 - **Shift+Alt+F** formats current document
 - Parameter hints not working — Devsense premium feature
+- Terminal scrollback increased from default 1000 to 10000 lines (`terminal.integrated.scrollback`)
+- Minimap disabled (`editor.minimap.enabled: false`)
+- Scrollbar visibility improved via `workbench.colorCustomizations`:
+```json
+"workbench.colorCustomizations": {
+    "scrollbarSlider.background": "#888888aa",
+    "scrollbarSlider.hoverBackground": "#aaaaaa",
+    "scrollbarSlider.activeBackground": "#cccccc"
+}
+```
 
 ### Known Intelephense False Positives
 - `auth()->login()` and `auth()->logout()` flagged as undefined — works fine
@@ -376,7 +394,8 @@ resources/views/
 - `<x-gig-tags>` — displays comma-separated tags as styled pills (DevGigs only)
 - `<x-gig-card>` — gig summary card (DevGigs only)
 - `<x-flash-message>` — displays session flash messages
-- `<x-footer>` — footer component with props: `bgColor`, `buttonText`, `buttonHref`, `showButton`
+- `<x-footer>` — footer component showing copyright info
+- `<x-fab>` — displays a Floating Action Button colored appropriately for the context via a prop
 
 ---
 
@@ -390,9 +409,9 @@ Standard Laravel auth. Users own records (`user_id` foreign key, included in `$f
 
 ### DevGigs
 - `App\Faker\DevGigsProvider` — provides `techTitle()` and `techSkills()`/`techSkillsCsv()`
-- `App\Faker\CanadaDataProvider` — provides Canadian cities and `areaCode()`
+- `App\Faker\CanadaDataProvider` — provides real Canadian city/province via `canadaLocations()`
 - Both registered in `AppServiceProvider::boot()` wrapped in `if ($this->app->environment('local', 'testing'))` to prevent production errors (Faker is a dev dependency)
-- `GigFactory` uses `techTitle()` and `techSkillsCsv()`
+- `GigFactory` uses `techTitle()` and `techSkillsCsv()` and `canadaLocations`
 
 ### MyStuff
 - No custom Faker providers
@@ -417,20 +436,33 @@ php artisan test --coverage
 php artisan test --coverage --coverage-html=coverage-report
 ```
 
-### Current test files
+### Excluding a test file temporarily
+Rename it to `FileName.old.php` — Pest only picks up files matching `*Test.php`. Alternatively, add an `<exclude>` inside the relevant `<testsuite>` in `phpunit.xml`:
+```xml
+<testsuite name="Feature">
+    <directory>tests/Feature</directory>
+    <exclude>tests/Feature/GigTest.php</exclude>
+</testsuite>
+```
+Note: the path goes directly as text content of `<exclude>` — no `<file>` child element (invalid in PHPUnit 11+).
+
+### Current test files and coverage
 | App | File | Coverage |
 |---|---|---|
-| DevGigs | `tests/Feature/GigTest.php` | ~83% GigController |
-| MyStuff | `tests/Feature/BookTest.php` | ~80% BookController |
-| MyStuff | `tests/Feature/AlbumTest.php` | ~80% AlbumController |
+| DevGigs | `tests/Feature/GigTest.php` | ~93% GigController |
+| MyStuff | `tests/Feature/BookTest.php` | ~91.7% BookController |
+| MyStuff | `tests/Feature/AlbumTest.php` | ~91.7% AlbumController |
 
-### Known coverage gaps (priority for next session)
-- Cloudinary upload/remove branches in `store()` and `update()` — requires mocking Cloudinary SDK
-- Tag filter on gigs index
-- Search filter on all index pages
-- Manage page only shows current user's own records
-- PUT and DELETE ownership enforcement (403 for non-owners)
-- Source-based redirect behaviour in `update()` and `destroy()`
+**MyStuff overall: 94.0%** — 100% on models, UserController, AppServiceProvider.
+
+### Remaining coverage gaps (intentionally untested)
+- Cloudinary upload/remove branches in `store()` and `update()` — decision made **not** to mock these. Mocked Cloudinary tests risk looking like bad tests to a reviewer; a small coverage gap is preferable.
+
+### What 94% coverage means
+Line coverage confirms every locally-executable PHP line has been hit. It does **not** cover: Render/Neon/Cloudinary infrastructure, browser-side JavaScript, Alpine.js interactions, cross-browser behaviour, concurrent users, session expiry, or load testing. Those are separate disciplines (integration testing, end-to-end testing with Dusk/Cypress, load testing) not expected for a portfolio project of this scope.
+
+### Known bugs found by tests
+- `scopeFilter` in both `Book` and `Album` models was using `request('search')` instead of `$filters['search']`. These are identical in an HTTP context but `request('search')` returns null when the scope is called directly in a test without an HTTP request, causing `%%` LIKE matches that return every record. Fixed in both models.
 
 ---
 
@@ -481,6 +513,8 @@ php artisan test --coverage
 - Cloudinary API secret is masked in the dashboard — click "Show password" to reveal the real value before copying the `CLOUDINARY_URL`
 - DevGigs `{gig}` wildcard routes require `.where('gig', '[0-9]+')` constraint — without it, named routes like `/login` are swallowed by the wildcard
 - `destroy()` and `update()` methods must accept `Request $request` as first parameter for source tracking to work
+- MyStuff routes use `/books/*` and `/albums/*` prefixes — test URLs must include the prefix (e.g. `/albums/{id}` not `/{id}`) or routes return 404 instead of reaching the controller
+- `scopeFilter` must use `$filters['search']` not `request('search')` — they differ when the scope is called directly in tests without an HTTP request
 
 ---
 
