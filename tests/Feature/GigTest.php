@@ -6,25 +6,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-/* Tests needed:
-
-Index page shows "No gigs" when there are no gigs
-Index page shows correct number of gigs (and the correct gigs) when there are gigs
-Search of text on index page returns all matching gigs and nothing more
-Search of tags on index page returns all matching gigs and nothing more
-
-Pressing FAB on index page goes to Create page
-Pressing FAB on show page goes to Create page
-Pressing FAB on manage page goes to Create page
-
-Pressing Create Gig on empty Create form produces must-be-entered errors for all fields except logo
-Pressing Create Gig on Create form with missing must-be-entered values produces errors for the fields which have been omitted
-Pressing Back on Create form (regardless of its state of completion) should return to Index page
-
-
-*/
-
-
 describe('Page loading while not logged in', function () {
   it('shows the gigs index page', function () {
     $response = $this->get('/');
@@ -235,6 +216,107 @@ describe('Search', function () {
       $this->gig2->id,
       $this->gig3->id,
       $this->gig4->id
+    ]);
+  });
+});
+
+describe('Sort by title', function () {
+  beforeEach(function () {
+    $this->gig1 = Gig::factory()->create([
+      'title' => 'Python Developer',
+      'company' => 'IBM',
+      'location' => 'Toronto, ON',
+    ]);
+    $this->gig2 = Gig::factory()->create([
+      'title' => 'Senior Laravel Developer',
+      'company' => 'Magna International',
+      'location' => 'Kingston, ON'
+    ]);
+    $this->gig3 = Gig::factory()->create([
+      'title' => 'Junior Laravel Developer',
+      'company' => 'Starsky and Hutch, Ltd.',
+      'location' => 'Geneva, Switzerland',
+    ]);
+    $this->gig4 = Gig::factory()->create([
+      'title' => 'Intermediate System Security Specialist',
+      'company' => 'Neon, Inc.',
+      'location' => 'Prince George, BC',
+    ]);
+    $this->gig5 = Gig::factory()->create([
+      'title' => 'Chat-based Tech Support',
+      'company' => 'Hugo Boss',
+      'location' => 'Oakville, ON',
+    ]);
+  });
+  it('Sorts gigs by title', function () {
+    $results = Gig::filter(['sort' => 'title'])->get();
+    expect($results)->toHaveCount(5);
+    expect($results->pluck('title')->all())->toEqual([
+      'Chat-based Tech Support',
+      'Intermediate System Security Specialist',
+      'Junior Laravel Developer',
+      'Python Developer',
+      'Senior Laravel Developer',
+    ]);
+  });
+
+  it('Handles unrecognized sort criteria', function () {
+    $results = Gig::filter(['sort' => 'foo'])->get();
+    expect($results)->toHaveCount(5);
+    expect($results->pluck('title')->all())->toEqual([
+      'Chat-based Tech Support',
+      'Intermediate System Security Specialist',
+      'Junior Laravel Developer',
+      'Python Developer',
+      'Senior Laravel Developer',
+    ]);
+  });
+
+  it('Handles empty sort criteria', function () {
+    $results = Gig::filter(['sort' => ''])->get();
+    expect($results)->toHaveCount(5);
+    expect($results->pluck('title')->all())->toEqual([
+      'Chat-based Tech Support',
+      'Intermediate System Security Specialist',
+      'Junior Laravel Developer',
+      'Python Developer',
+      'Senior Laravel Developer',
+    ]);
+  });
+
+  it('Handles no sort criteria', function () {
+    $results = Gig::filter([])->get();
+    expect($results)->toHaveCount(5);
+    expect($results->pluck('title')->all())->toEqual([
+      'Chat-based Tech Support',
+      'Intermediate System Security Specialist',
+      'Junior Laravel Developer',
+      'Python Developer',
+      'Senior Laravel Developer',
+    ]);
+  });
+
+  it('Sort gigs by company', function () {
+    $results = Gig::filter(['sort' => 'company'])->get();
+    expect($results)->toHaveCount(5);
+    expect($results->pluck('company')->all())->toEqual([
+      'Hugo Boss',
+      'IBM',
+      'Magna International',
+      'Neon, Inc.',
+      'Starsky and Hutch, Ltd.',
+    ]);
+  });
+
+  it('Sorts gigs by location', function () {
+    $results = Gig::filter(['sort' => 'location'])->get();
+    expect($results)->toHaveCount(5);
+    expect($results->pluck('location')->all())->toEqual([
+      'Geneva, Switzerland',
+      'Kingston, ON',
+      'Oakville, ON',
+      'Prince George, BC',
+      'Toronto, ON',
     ]);
   });
 });

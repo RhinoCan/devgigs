@@ -31,6 +31,21 @@ class Gig extends Model
         ->orWhere('location', 'like', '%' . $filters['search'] . '%')
         ->orWhere('tags', 'like', '%' . $filters['search'] . '%');
     }
+
+    if ($filters['sort'] ?? false) {
+      $sortColumn = $filters['sort'];
+      if ($sortColumn === 'title') {
+        $query->orderBy('title');
+      } elseif ($sortColumn === 'company') {
+        $query->orderBy('company');
+      } elseif ($sortColumn === 'location') {
+        $query->orderBy('location');
+      } else {
+        $query->orderBy('title');
+      }
+    } else {
+      $query->orderBy('title');
+    }
   }
 
   public function user()

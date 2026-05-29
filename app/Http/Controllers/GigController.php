@@ -12,7 +12,7 @@ class GigController extends Controller
   public function index()
   {
     return view('gigs.index', [
-      'gigs' => Gig::latest()->filter(request(['tags', 'search']))->paginate(6)
+      'gigs' => Gig::filter(request(['tags', 'search', 'sort']))->paginate(10)
     ]);
   }
 
