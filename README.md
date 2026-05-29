@@ -28,6 +28,7 @@ Registered users have the ability to create gigs, and then update and delete any
 - Tailwind CSS 4.x (via Vite)
 - Alpine.js (for flash messages)
 - JavaScript (for handling the grid and list views)
+- Docker
 - Render (for production deployment)
 - Neon (for the PostgreSQL database used in production)
 - Cloudinary (for the storage of logos in production)

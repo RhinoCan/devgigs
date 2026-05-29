@@ -1,5 +1,11 @@
 #!/usr/bin/env sh
 
+echo "Installing npm dependencies..."
+npm install
+
+echo "Building assets..."
+npm run build
+
 echo "Running package discovery..."
 php artisan package:discover --ansi
 
