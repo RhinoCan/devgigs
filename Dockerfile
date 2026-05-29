@@ -4,6 +4,9 @@ FROM php:8.4-fpm-alpine
 RUN apk add --no-cache nginx supervisor curl zip unzip git \
     libpng-dev libzip-dev postgresql-dev
 
+# Install Node.js
+RUN apk add --no-cache nodejs npm
+
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_pgsql zip gd opcache
 
@@ -14,6 +17,9 @@ RUN echo "upload_max_filesize=20M" > /usr/local/etc/php/conf.d/uploads.ini \
 
 # Install composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Build frontend assets
+RUN npm install && npm run build
 
 # Set working directory
 WORKDIR /var/www/html
