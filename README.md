@@ -42,6 +42,9 @@ Registered users have the ability to create gigs, and then update and delete any
 6. Run `php artisan migrate --seed`
 7. Run `npm run dev` and `php artisan serve` in separate terminals
 
+### Known Limitations
+Password reset is not implemented. Authentication was built manually following Brad Traversy's course structure rather than using Laravel Breeze. A future iteration would use Breeze or an equivalent to add password reset, email verification, and other auth features.
+
 ## Credits
 After a few years away from Laravel, I decided to refresh my memory of Laravel by taking Brad Traversy's excellent YouTube course that builds "Laragigs", an app that lets imaginary employers put imaginary jobs on a website. With some additional tutelage from Claude.AI to bring me up to speed on changes to Laravel since the course was written in 2022 and refresh my memory on other aspects of Laravel, I built the entire app following the course's instructions.
 

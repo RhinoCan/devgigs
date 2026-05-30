@@ -37,9 +37,27 @@ class AppServiceProvider extends ServiceProvider
           )
         );
     }
-
+/*
+| -------------------------------------------------------------------------- |
+| AppServiceProvider HTTPS Enforcement                                       |
+| -------------------------------------------------------------------------- |
+|                                                                            |
+| No automated test is provided for the URL::forceScheme('https') call in    |
+| AppServiceProvider::boot().                                                |
+|                                                                            |
+| The code contains no application-specific business logic and merely        |
+| delegates to Laravel's framework functionality. Testing it would require   |
+| coupling the test to Laravel's bootstrapping internals, producing a        |
+| brittle test with little additional confidence.                            |
+|                                                                            |
+| The behaviour is instead verified through application configuration and    |
+| manual deployment checks in the production environment.                    |
+| -------------------------------------------------------------------------- |
+*/
     if (config('app.env') === 'production') {
       \Illuminate\Support\Facades\URL::forceScheme('https');
     }
+
+    \Illuminate\Pagination\Paginator::defaultView('pagination::tailwind');
   }
 }

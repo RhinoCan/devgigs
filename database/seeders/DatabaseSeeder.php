@@ -16,9 +16,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+          'name' => 'Harvey J. Sprinkledoink',
+          'email' => 'harvey@example.com',
+          'password' => bcrypt('password')
+        ]);
 
-        Gig::factory(15)->create([
+        Gig::factory(25)->create([
           'user_id' => $user->id
         ]);
     }

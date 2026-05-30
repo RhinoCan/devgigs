@@ -21,14 +21,14 @@
 <body class="mb-48">
     <x-flash-message />
     <nav class="flex justify-between items-center mb-4 mt-12">
-        <a href="/"><img class="w-24" src="{{ asset('/images/DevGigs_logo.png') }}"
-                alt="DevGigs logo" class="logo" /></a>
+        <a href="/"><img class="w-24" src="{{ asset('/images/DevGigs_logo.png') }}" alt="DevGigs logo"
+                class="logo" /></a>
         <ul class="flex space-x-6 mr-6 text-lg">
             @auth
                 <li>
                     <span class="font-bold uppercase">Welcome {{ auth()->user()->name }}</span>
                 </li>
-                <li><a href="/manage" class="hover:text-gigs"><i class="fa-solid fa-gear"></i> Manage
+                <li><a href="/manage" class="text-gigs"><i class="fa-solid fa-gear"></i> Manage
                         Gigs</a></li>
                 <li>
                 <li>
@@ -41,10 +41,10 @@
                 </li>
             @else
                 <li>
-                    <a href="/register" class="hover:text-laravel"><i class="fa-solid fa-user-plus"></i> Register</a>
+                    <a href="/register"><i class="fa-solid fa-user-plus"></i> Register</a>
                 </li>
                 <li>
-                    <a href="/login" class="hover:text-laravel"><i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <a href="/login"><i class="fa-solid fa-arrow-right-to-bracket"></i>
                         Login</a>
                 </li>
             @endauth

@@ -16,6 +16,11 @@
                                 {{ $gig->title }} - {{ $gig->company }}
                             </td>
                             <td class="px-4 py-8 border-t border-b border-gray-300 text-lg">
+                                <a href="/{{ $gig->id }}/edit?source=manage" class="text-green-400 px-6 py-2 rounded-xl"><i
+                                        class="fa-solid fa-eye"></i>
+                                    View</a>
+                            </td>
+                            <td class="px-4 py-8 border-t border-b border-gray-300 text-lg">
                                 <a href="/{{ $gig->id }}/edit?source=manage" class="text-blue-400 px-6 py-2 rounded-xl"><i
                                         class="fa-solid fa-pen-to-square"></i>
                                     Edit</a>

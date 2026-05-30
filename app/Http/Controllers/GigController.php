@@ -11,8 +11,9 @@ class GigController extends Controller
   // Show all gigs
   public function index()
   {
+    $perPage = request('perPage', 20);
     return view('gigs.index', [
-      'gigs' => Gig::filter(request(['tags', 'search', 'sort']))->paginate(10)
+      'gigs' => Gig::filter(request(['search', 'sort']))->paginate($perPage)
     ]);
   }
 

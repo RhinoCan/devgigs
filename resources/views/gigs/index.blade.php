@@ -4,10 +4,9 @@
     @include('partials._search_gigs')
     @include('partials._controls_gigs')
 
-    <div class="lg:grid lg:grid-cols-2 gap-4 space-y-4 md:space-y-0 mx-4">
-
+    <div class="mx-4">
         @unless (count($gigs) == 0)
-          <div id="gridView">
+          <div id="gridView" class="lg:grid lg:grid-cols-2 gap-4 space-y-4 md:space-y-0">
             @foreach ($gigs as $gig)
               <x-gig-card :gig="$gig" />
             @endforeach
@@ -23,12 +22,29 @@
             <p>No gigs found</p>
         @endunless
     </div>
-    <div class="mt-6 p-4">
-        {{ $gigs->appends(['search' => request('search'), 'tags' => request('tags'), 'sort' => request('sort')])->links() }}
+    <div class="flex items-center justify-between mt-6 p-4">
+        <div class="flex items-center gap-2">
+            <span class="mr-2 text-sm">Per page:</span>
+            <div class="inline-flex divide-x border border-gray-300 rounded-lg overflow-hidden">
+                <a href="?perPage=10&sort={{ request('sort') }}&search={{ request('search') }}"
+                    class="inline-block pt-2 h-10 px-4 {{ request('perPage', 20) == 10 ? 'bg-gray-800 text-white' : 'bg-white text-black hover:bg-gray-100' }}">10</a>
+                <a href="?perPage=20&sort={{ request('sort') }}&search={{ request('search') }}"
+                    class="inline-block pt-2 h-10 px-4 {{ request('perPage', 20) == 20 ? 'bg-gray-800 text-white' : 'bg-white text-black hover:bg-gray-100' }}">20</a>
+                <a href="?perPage=50&sort={{ request('sort') }}&search={{ request('search') }}"
+                    class="inline-block pt-2 h-10 px-4 {{ request('perPage', 20) == 50 ? 'bg-gray-800 text-white' : 'bg-white text-black hover:bg-gray-100' }}">50</a>
+                <a href="?perPage=100&sort={{ request('sort') }}&search={{ request('search') }}"
+                    class="inline-block pt-2 h-10 px-4 {{ request('perPage', 20) == 100 ? 'bg-gray-800 text-white' : 'bg-white text-black hover:bg-gray-100' }}">100</a>
+            </div>
+        </div>
+        @if ($gigs->total() > $gigs->perPage())
+        <div>
+            {{ $gigs->appends(['search' => request('search'), 'sort' => request('sort'), 'perPage' => request('perPage', 20)])->links() }}
+        </div>
+        @endif
     </div>
-
-    <x-fab bgColor='bg-gigs' />
     <x-footer />
+    <x-fab bgColor='bg-gigs' />
+
     <script>
         const gridView = document.getElementById('gridView');
         const listView = document.getElementById('listView');
@@ -44,7 +60,7 @@
 
         function setView(view) {
             if (view === "grid") {
-                gridView.style.display = 'block';
+                gridView.style.display = '';
                 listView.style.display = 'none';
                 btnGrid.classList.add('bg-gigs', 'text-white');
                 btnGrid.classList.remove('bg-gray-50', 'text-black');
@@ -58,7 +74,7 @@
                 btnList.classList.add('bg-gigs', 'text-white');
                 btnList.classList.remove('bg-gray-50', 'text-black');
             } else {
-                gridView.style.display = 'block';
+                gridView.style.display = '';
                 listView.style.display = 'none';
                 btnGrid.classList.add('bg-gigs', 'text-white');
                 btnList.classList.remove('bg-gigs', 'text-white');
