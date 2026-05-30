@@ -3,6 +3,9 @@
 echo "Running package discovery..."
 php artisan package:discover --ansi
 
+echo "Clearing view cache..."
+php artisan view:clear
+
 echo "Caching config..."
 php artisan config:cache
 
